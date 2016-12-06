@@ -17480,7 +17480,11 @@ var Thumbor = (function (_Component) {
         attrs.style = _lodash2['default'].extend(attrs.style, {
           backgroundImage: 'url("' + this.image + '")'
         });
-        return _react2['default'].createElement('div', _extends({ key: 'div' }, attrs));
+        return _react2['default'].createElement(
+          'div',
+          _extends({ key: 'div' }, attrs),
+          this.props.children
+        );
       } else {
         if (this.height.value) attrs.height = this.height.value + this.height.type;
         if (this.width.value) attrs.width = this.width.value + this.width.type;
