@@ -27,18 +27,14 @@ export default class Thumbor extends Component {
 
   componentDidMount() {
     this.loadedImageId = this.getRandomId();
-    this.imageId = this.getRandomId();
+    this.id = this.getRandomId();
     this.loadedImage = (<img id={this.loadedImageId} key="loadedImage" src={this.image} onLoad={this.imageLoaded.bind(this)} onError={this.imageError.bind(this)} hidden={true} />);
     this.setState({mounted: true});
   }
 
   componentDidUpdate() {
     if (this.state.imageLoaded && this.imageRendered && !this.imageDisplayed) {
-      console.log('yay');
-      var image = document.getElementById(this.imageId);
-      setTimeout(() => {
-        image.style.opacity = '1';
-      }, 100);
+      document.getElementById(this.id).style.opacity = '1';
       this.imageDisplayed = true;
     }
   }
@@ -57,7 +53,10 @@ export default class Thumbor extends Component {
         console.log(this.height);
       }
     }
-		return (<div>
+		return (<div id={this.id} style={{
+      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+      opacity: 0
+    }}>
       {rendered}
 		</div>);
 	}
@@ -65,10 +64,7 @@ export default class Thumbor extends Component {
   renderImage() {
     var attrs = {};
     var preset = this.getPreset();
-    attrs.style = _.extend(attrs.style, {
-      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
-      opacity: 0
-    });
+    attrs.style = _.extend(attrs.style, {});
     if (this.type === 'background') {
       attrs.style = _.extend(attrs.style, {
         backgroundImage: 'url("' + this.image + '")',
@@ -98,9 +94,9 @@ export default class Thumbor extends Component {
     if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
     this.imageRendered = true;
     if (this.type === 'background') {
-      return (<div key="div" id={this.imageId} {...attrs}>{this.props.children}</div>);
+      return (<div key="div" {...attrs}>{this.props.children}</div>);
     } else {
-      return (<img key="img" id={this.imageId} src={this.image} {...attrs} />);
+      return (<img key="img" src={this.image} {...attrs} />);
     }
   }
 
