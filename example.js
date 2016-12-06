@@ -45,6 +45,7 @@ var App = (function (_Component) {
 				_react2['default'].createElement(
 					_reactThumbor2['default'],
 					{
+						preset: 'responsive',
 						debug: true,
 						server: 'https://images.groupthreads.com',
 						src: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Tampa_FL_Sulphur_Springs_Tower_tall_pano02.jpg' },

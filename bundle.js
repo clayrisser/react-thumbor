@@ -37834,12 +37834,16 @@ var Thumbor = (function (_Component) {
       this.loadedImageId = this.getRandomId();
       this.id = this.getRandomId();
       this.imageId = this.getRandomId();
+      this.previewContentId = this.getRandomId();
+      this.finalContentId = this.getRandomId();
       this.loadedImage = _react2['default'].createElement('img', { id: this.loadedImageId, key: 'loadedImage', src: this.image, onLoad: this.imageLoaded.bind(this), onError: this.imageError.bind(this), hidden: true });
       this.setState({ mounted: true });
     }
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
+      var _this = this;
+
       if (this.state.imageLoaded && this.imageRendered) {
         var image = document.getElementById(this.imageId);
         setTimeout(function () {
@@ -37850,6 +37854,10 @@ var Thumbor = (function (_Component) {
             id: this.id
           });
         }
+        this.resized();
+        window.addEventListener('resize', function () {
+          _this.resized();
+        });
       }
     }
   }, {
@@ -37857,7 +37865,7 @@ var Thumbor = (function (_Component) {
     value: function render() {
       var placeholder = this.getPlaceholder();
       var rendered = [placeholder];
-      if (this.state.mounted) {
+      if (this.state.mounted && !this.state.imageLoaded) {
         rendered.push(this.loadedImage);
       }
       if (this.state.imageLoaded && !this.imageRendered) {
@@ -37873,6 +37881,21 @@ var Thumbor = (function (_Component) {
         { id: this.id },
         rendered
       );
+    }
+  }, {
+    key: 'resized',
+    value: function resized() {
+      if (this.type === 'background') {
+        var image = document.getElementById(this.imageId);
+        var content = false;
+        if (this.imageRendered) {
+          content = document.getElementById(this.finalContentId);
+        } else {
+          content = document.getElementById(this.previewContentId);
+        }
+        content.style.width = image.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight) + 'px';
+        content.style.height = image.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom) + 'px';
+      }
     }
   }, {
     key: 'renderImage',
@@ -37918,7 +37941,7 @@ var Thumbor = (function (_Component) {
           { key: 'div' },
           _react2['default'].createElement(
             'div',
-            { style: this.getContentStyle() },
+            { id: this.finalContentId, style: this.getContentStyle() },
             this.props.children
           ),
           _react2['default'].createElement('div', _extends({ id: this.imageId }, attrs))
@@ -37926,6 +37949,11 @@ var Thumbor = (function (_Component) {
       } else {
         return _react2['default'].createElement('img', _extends({ key: 'img', id: this.imageId, src: this.image }, attrs));
       }
+    }
+  }, {
+    key: 'pixelToNumber',
+    value: function pixelToNumber(pixel) {
+      return Number(pixel.substring(0, pixel.length - 2));
     }
   }, {
     key: 'getPlaceholder',
@@ -37950,7 +37978,7 @@ var Thumbor = (function (_Component) {
         { key: 'placeholder', style: style },
         _react2['default'].createElement(
           'div',
-          { style: this.getContentStyle() },
+          { id: this.previewContentId, style: this.getContentStyle() },
           this.props.children
         )
       );
