@@ -12,8 +12,9 @@ export default class Thumbor extends Component {
 	}
 
   componentWillMount() {
-    if (window.reactThumbor && window.reactThumbor.server) {
-      this.server = window.reactThumbor.server;
+    if (process.env.BROWSER) var global = window;
+    if (global.reactThumbor && global.reactThumbor.server) {
+      this.server = global.reactThumbor.server;
     }
     if (this.props.server) {
       this.server = this.props.server;
