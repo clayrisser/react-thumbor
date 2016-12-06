@@ -39,7 +39,8 @@ var App = (function (_Component) {
   _createClass(App, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
-      window.reactThumbor = {
+      var global = {};
+      global.reactThumbor = {
         server: 'https://images.groupthreads.com'
       };
     }
