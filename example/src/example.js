@@ -11,7 +11,7 @@ export default class App extends Component {
           debug={true}
           server="https://images.groupthreads.com"
           src="http://www.wallpaperup.com/uploads/wallpapers/2014/01/23/235641/big_thumb_862478b1ad52546192af60ff03efbde9.jpg">
-      <h1>This is Hard</h1>
+      <h1>This aklsjd lksdjf askldjf sdaklfjksdf lslkdf slkdjf slk djflk sdjflk sadflksjdflksd is Hard alksdjf as</h1>
       </Thumbor>
 			</div>
 		);

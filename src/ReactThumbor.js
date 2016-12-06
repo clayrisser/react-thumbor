@@ -36,8 +36,10 @@ export default class Thumbor extends Component {
   }
 
   componentDidUpdate() {
-    if (this.state.mounted && !this.state.imageLoaded) {
-      this.resized();
+    this.resized();
+    if (this.type === 'background' && !this.imageRendered) {
+      var content = document.getElementById(this.previewContentId);
+      content.style.display = 'inherit';
     }
     if (this.state.imageLoaded && this.imageRendered) {
       var image = document.getElementById(this.imageId);
@@ -85,8 +87,8 @@ export default class Thumbor extends Component {
         content = document.getElementById(this.previewContentId);
         parent = document.getElementById(this.id);
       }
-      content.style.width = (parent.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight)) + 'px';
-      content.style.height = (parent.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom)) + 'px';
+      content.style.width = parent.offsetWidth + 'px';
+      content.style.height = parent.offsetHeight + 'px';
     }
   }
 
@@ -128,16 +130,20 @@ export default class Thumbor extends Component {
     this.imageRendered = true;
     if (this.type === 'background') {
       return (<div key="div">
-        <div id={this.finalContentId} style={this.getContentStyle()}>{this.props.children}</div>
+        <div style={{
+          margin: '0px',
+          padding: '0px',
+          backgroundColor: 'rgba(255, 255, 255, 0)',
+          zIndex: 1,
+          position: 'absolute'
+        }} id={this.finalContentId}>
+          <div style={this.getContentStyle()}>{this.props.children}</div>
+        </div>
         <div id={this.imageId} {...attrs}></div>
       </div>);
     } else {
       return (<img key="img" id={this.imageId} src={this.image} {...attrs} />);
     }
-  }
-
-  pixelToNumber(pixel) {
-    return Number(pixel.substring(0, pixel.length - 2));
   }
 
   getPlaceholder() {
@@ -157,15 +163,21 @@ export default class Thumbor extends Component {
     if (this.props.maxWidth) style.maxWidth = this.props.maxWidth;
     if (this.props.backgroundColor) style.backgroundColor = this.props.backgroundColor;
     return (<div key="placeholder" style={style}>
-      <div id={this.previewContentId} style={this.getContentStyle()}>{this.props.children}</div>
+      <div style={{
+        margin: '0px',
+        padding: '0px',
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        zIndex: 1,
+        display: 'none',
+        position: 'absolute'
+      }} id={this.previewContentId}>
+        <div style={this.getContentStyle()}>{this.props.children}</div>
+      </div>
     </div>);
   }
 
   getContentStyle() {
     var style = {
-      backgroundColor: 'rgba(255, 255, 255, 0)',
-      zIndex: 1,
-      position: 'absolute',
       padding: '10px 20px'
     };
     if (this.props.contentStyle) style = _.extend(style, this.props.contentStyle);
