@@ -37845,6 +37845,9 @@ var Thumbor = (function (_Component) {
     value: function componentDidUpdate() {
       var _this = this;
 
+      if (this.state.mounted && !this.state.imageLoaded) {
+        this.resized();
+      }
       if (this.state.imageLoaded && this.imageRendered) {
         var image = document.getElementById(this.imageId);
         setTimeout(function () {
@@ -37855,7 +37858,6 @@ var Thumbor = (function (_Component) {
             id: this.id
           });
         }
-        this.resized();
         window.addEventListener('resize', function () {
           _this.resized();
         });
@@ -37887,15 +37889,17 @@ var Thumbor = (function (_Component) {
     key: 'resized',
     value: function resized() {
       if (this.type === 'background') {
-        var image = document.getElementById(this.imageId);
+        var parent = false;
         var content = false;
         if (this.imageRendered) {
           content = document.getElementById(this.finalContentId);
+          parent = document.getElementById(this.imageId);
         } else {
           content = document.getElementById(this.previewContentId);
+          parent = document.getElementById(this.id);
         }
-        content.style.width = image.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight) + 'px';
-        content.style.height = image.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom) + 'px';
+        content.style.width = parent.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight) + 'px';
+        content.style.height = parent.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom) + 'px';
       }
     }
   }, {
