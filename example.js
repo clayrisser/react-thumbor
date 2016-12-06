@@ -2,7 +2,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-  value: true
+	value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -28,38 +28,28 @@ var _reactThumbor = require('react-thumbor');
 var _reactThumbor2 = _interopRequireDefault(_reactThumbor);
 
 var App = (function (_Component) {
-  _inherits(App, _Component);
+	_inherits(App, _Component);
 
-  function App() {
-    _classCallCheck(this, App);
+	function App() {
+		_classCallCheck(this, App);
 
-    _get(Object.getPrototypeOf(App.prototype), 'constructor', this).apply(this, arguments);
-  }
+		_get(Object.getPrototypeOf(App.prototype), 'constructor', this).apply(this, arguments);
+	}
 
-  _createClass(App, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      var global = {};
-      global.reactThumbor = {
-        server: 'https://images.groupthreads.com'
-      };
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return _react2['default'].createElement(
-        'div',
-        null,
-        _react2['default'].createElement(_reactThumbor2['default'], {
-          height: '800px',
-          width: '50%',
-          preset: 'responsive',
-          src: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Tampa_FL_Sulphur_Springs_Tower_tall_pano02.jpg' })
-      );
-    }
-  }]);
+	_createClass(App, [{
+		key: 'render',
+		value: function render() {
+			return _react2['default'].createElement(
+				'div',
+				null,
+				_react2['default'].createElement(_reactThumbor2['default'], {
+					server: 'https://images.groupthreads.com',
+					src: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Tampa_FL_Sulphur_Springs_Tower_tall_pano02.jpg' })
+			);
+		}
+	}]);
 
-  return App;
+	return App;
 })(_react.Component);
 
 exports['default'] = App;
