@@ -37839,9 +37839,11 @@ var Thumbor = (function (_Component) {
   }, {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
-      if (this.state.imageLoaded && this.imageRendered && !this.imageDisplayed) {
+      if (this.state.imageLoaded && this.imageRendered) {
         document.getElementById(this.id).style.opacity = '1';
-        this.imageDisplayed = true;
+        if (this.props.onRender) {
+          this.props.onRender();
+        }
       }
     }
   }, {
