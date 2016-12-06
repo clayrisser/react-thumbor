@@ -27,18 +27,31 @@ export default class Thumbor extends Component {
 
   componentDidMount() {
     this.loadedImageId = this.getRandomId();
+    this.imageId = this.getRandomId();
     this.loadedImage = (<img id={this.loadedImageId} key="loadedImage" src={this.image} onLoad={this.imageLoaded.bind(this)} onError={this.imageError.bind(this)} hidden={true} />);
     this.setState({mounted: true});
   }
 
+  componentDidUpdate() {
+    if (this.state.imageLoaded && this.imageRendered && !this.imageDisplayed) {
+      console.log('yay');
+      var image = document.getElementById(this.imageId);
+      setTimeout(() => {
+        image.style.opacity = '1';
+      }, 100);
+      this.imageDisplayed = true;
+    }
+  }
+
 	render() {
-    var rendered = [];
+    var placeholder = this.getPlaceholder();
+    var rendered = [placeholder];
     if (this.state.mounted) {
       rendered.push(this.loadedImage);
     }
     if (this.state.imageLoaded && !this.imageRendered) {
       this.updateDimensions();
-      rendered.push(this.renderImage());
+      rendered[0] = this.renderImage();
       if (this.props.debug) {
         console.log(this.width);
         console.log(this.height);
@@ -53,10 +66,12 @@ export default class Thumbor extends Component {
     var attrs = {};
     var preset = this.getPreset();
     attrs.style = _.extend(attrs.style, {
-      backgroundImage: 'url("' + this.image + '")',
+      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+      opacity: 0
     });
     if (this.type === 'background') {
       attrs.style = _.extend(attrs.style, {
+        backgroundImage: 'url("' + this.image + '")',
         backgroundPosition: 'center',
         width: '100%'
       });
@@ -81,12 +96,28 @@ export default class Thumbor extends Component {
     }
     if (this.props.maxWidth) attrs.style = _.extend(attrs.style, {maxWidth: this.props.maxWidth});
     if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
-    this.imageRendered = false;
+    this.imageRendered = true;
     if (this.type === 'background') {
-      return (<div key="div" {...attrs}>{this.props.children}</div>);
+      return (<div key="div" id={this.imageId} {...attrs}>{this.props.children}</div>);
     } else {
-      return (<img key="img" src={this.image} {...attrs} />);
+      return (<img key="img" id={this.imageId} src={this.image} {...attrs} />);
     }
+  }
+
+  getPlaceholder() {
+    var style = {};
+    var preset = this.getPreset();
+    if (this.height.value) style.height = this.height.value + this.height.type;
+    if (this.width.value) style.width = this.width.value + this.width.type;
+    if (preset.height) style.height = preset.height;
+    if (preset.maxHeight) style.maxHeight = preset.maxHeight;
+    if (preset.width) style.width = preset.width;
+    if (preset.maxWidth) style.maxWidth = preset.maxWidth;
+    if (this.props.height) style.height = this.props.height;
+    if (this.props.maxHeight) style.maxHeight = this.props.maxHeight;
+    if (this.props.width) style.width = this.props.width;
+    if (this.props.maxWidth) style.maxWidth = this.props.maxWidth;
+    return (<div key="placeholder" style={style}></div>);
   }
 
   getPreset() {
