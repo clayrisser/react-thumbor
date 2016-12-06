@@ -28,15 +28,21 @@ export default class Thumbor extends Component {
   componentDidMount() {
     this.loadedImageId = this.getRandomId();
     this.id = this.getRandomId();
+    this.imageId = this.getRandomId();
     this.loadedImage = (<img id={this.loadedImageId} key="loadedImage" src={this.image} onLoad={this.imageLoaded.bind(this)} onError={this.imageError.bind(this)} hidden={true} />);
     this.setState({mounted: true});
   }
 
   componentDidUpdate() {
     if (this.state.imageLoaded && this.imageRendered) {
-      document.getElementById(this.id).style.opacity = '1';
+      var image = document.getElementById(this.imageId);
+      setTimeout(() => {
+        image.style.opacity = 1;
+      }, 100);
       if (this.props.onRender) {
-        this.props.onRender();
+        this.props.onRender({
+          id: this.id
+        });
       }
     }
   }
@@ -55,10 +61,7 @@ export default class Thumbor extends Component {
         console.log(this.height);
       }
     }
-		return (<div id={this.id} style={{
-      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
-      opacity: 0
-    }}>
+		return (<div id={this.id}>
       {rendered}
 		</div>);
 	}
@@ -66,11 +69,15 @@ export default class Thumbor extends Component {
   renderImage() {
     var attrs = {};
     var preset = this.getPreset();
-    attrs.style = _.extend(attrs.style, {});
+    attrs.style = _.extend(attrs.style, {
+      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+      opacity: 0
+    });
     if (this.type === 'background') {
       attrs.style = _.extend(attrs.style, {
-        backgroundImage: 'url("' + this.image + '")',
+        backgroundColor: 'rgba(255, 255, 255, 0)',
         backgroundPosition: 'center',
+        backgroundImage: 'url("' + this.image + '")',
         width: '100%'
       });
       if (this.width.value) attrs.style = _.extend(attrs.style, {width: this.width.value + this.width.type});
@@ -96,14 +103,19 @@ export default class Thumbor extends Component {
     if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
     this.imageRendered = true;
     if (this.type === 'background') {
-      return (<div key="div" {...attrs}>{this.props.children}</div>);
+      return (<div key="div">
+      <div style={this.getContentStyle()}>{this.props.children}</div>
+        <div id={this.imageId} {...attrs}></div>
+      </div>);
     } else {
-      return (<img key="img" src={this.image} {...attrs} />);
+      return (<img key="img" id={this.imageId} src={this.image} {...attrs} />);
     }
   }
 
   getPlaceholder() {
-    var style = {};
+    var style = {
+      backgroundColor: 'rgba(255, 255, 255, 0)',
+    };
     var preset = this.getPreset();
     if (this.height.value) style.height = this.height.value + this.height.type;
     if (this.width.value) style.width = this.width.value + this.width.type;
@@ -115,7 +127,22 @@ export default class Thumbor extends Component {
     if (this.props.maxHeight) style.maxHeight = this.props.maxHeight;
     if (this.props.width) style.width = this.props.width;
     if (this.props.maxWidth) style.maxWidth = this.props.maxWidth;
-    return (<div key="placeholder" style={style}></div>);
+    if (this.props.backgroundColor) style.backgroundColor = this.props.backgroundColor;
+    if (this.props.contentStyles)
+    return (<div key="placeholder" style={style}>
+      <div style={this.getContentStyle()}>{this.props.children}</div>
+    </div>);
+  }
+
+  getContentStyle() {
+    var style = {
+      backgroundColor: 'rgba(255, 255, 255, 0)',
+      zIndex: 1,
+      position: 'absolute',
+      padding: '10px 20px'
+    };
+    if (this.props.contentStyle) style = _.extend(style, this.props.contentStyle);
+    return style;
   }
 
   getPreset() {

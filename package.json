@@ -1,6 +1,6 @@
 {
   "name": "react-thumbor",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "react-thumbor",
   "main": "lib/ReactThumbor.js",
   "author": "jamrizzi",
