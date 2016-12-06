@@ -152,7 +152,6 @@ export default class Thumbor extends Component {
     if (this.props.width) style.width = this.props.width;
     if (this.props.maxWidth) style.maxWidth = this.props.maxWidth;
     if (this.props.backgroundColor) style.backgroundColor = this.props.backgroundColor;
-    if (this.props.contentStyles)
     return (<div key="placeholder" style={style}>
       <div id={this.previewContentId} style={this.getContentStyle()}>{this.props.children}</div>
     </div>);
@@ -231,7 +230,7 @@ export default class Thumbor extends Component {
          width.substring(width.length - 1) === 'vw') &&
         (!height || height.substring(height.length - 1) === '%' ||
          height.substring(height.length - 1) === 'vh'||
-         height.substring(height.length - 1) === 'vw')) {
+         height.substring(height.length - 1) === 'vw') && !realWidth && !realHeight) {
       var guessed = false;
       if (maxWidth) {
         if (maxWidth.substring(maxWidth.length - 2) === 'px') {

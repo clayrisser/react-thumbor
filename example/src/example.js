@@ -10,7 +10,7 @@ export default class App extends Component {
           preset="responsive"
           debug={true}
           server="https://images.groupthreads.com"
-          src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Tampa_FL_Sulphur_Springs_Tower_tall_pano02.jpg">
+          src="http://www.wallpaperup.com/uploads/wallpapers/2014/01/23/235641/big_thumb_862478b1ad52546192af60ff03efbde9.jpg">
       <h1>This is Hard</h1>
       </Thumbor>
 			</div>
