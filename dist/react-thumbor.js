@@ -17418,9 +17418,6 @@ var Thumbor = (function (_Component) {
       if (global && global.reactThumbor && global.reactThumbor.server) {
         this.server = global.reactThumbor.server;
       }
-      if (window && window.reactThumbor && window.reactThumbor.server) {
-        this.server = window.reactThumbor.server;
-      }
       if (this.props.server) {
         this.server = this.props.server;
       }

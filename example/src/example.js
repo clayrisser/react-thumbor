@@ -4,7 +4,8 @@ import Thumbor from 'react-thumbor';
 
 export default class App extends Component {
   componentWillMount() {
-    window.reactThumbor = {
+    var global = {};
+    global.reactThumbor = {
       server: 'https://images.groupthreads.com'
     };
   }
