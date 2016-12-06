@@ -29,6 +29,8 @@ export default class Thumbor extends Component {
     this.loadedImageId = this.getRandomId();
     this.id = this.getRandomId();
     this.imageId = this.getRandomId();
+    this.previewContentId = this.getRandomId();
+    this.finalContentId = this.getRandomId();
     this.loadedImage = (<img id={this.loadedImageId} key="loadedImage" src={this.image} onLoad={this.imageLoaded.bind(this)} onError={this.imageError.bind(this)} hidden={true} />);
     this.setState({mounted: true});
   }
@@ -44,13 +46,17 @@ export default class Thumbor extends Component {
           id: this.id
         });
       }
+      this.resized();
+      window.addEventListener('resize', () => {
+        this.resized();
+      });
     }
   }
 
 	render() {
     var placeholder = this.getPlaceholder();
     var rendered = [placeholder];
-    if (this.state.mounted) {
+    if (this.state.mounted && !this.state.imageLoaded) {
       rendered.push(this.loadedImage);
     }
     if (this.state.imageLoaded && !this.imageRendered) {
@@ -65,6 +71,20 @@ export default class Thumbor extends Component {
       {rendered}
 		</div>);
 	}
+
+  resized() {
+    if (this.type === 'background') {
+      var image = document.getElementById(this.imageId);
+      var content = false;
+      if (this.imageRendered) {
+        content = document.getElementById(this.finalContentId);
+      } else {
+        content = document.getElementById(this.previewContentId);
+      }
+      content.style.width = (image.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight)) + 'px';
+      content.style.height = (image.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom)) + 'px';
+    }
+  }
 
   renderImage() {
     var attrs = {};
@@ -104,12 +124,16 @@ export default class Thumbor extends Component {
     this.imageRendered = true;
     if (this.type === 'background') {
       return (<div key="div">
-      <div style={this.getContentStyle()}>{this.props.children}</div>
+        <div id={this.finalContentId} style={this.getContentStyle()}>{this.props.children}</div>
         <div id={this.imageId} {...attrs}></div>
       </div>);
     } else {
       return (<img key="img" id={this.imageId} src={this.image} {...attrs} />);
     }
+  }
+
+  pixelToNumber(pixel) {
+    return Number(pixel.substring(0, pixel.length - 2));
   }
 
   getPlaceholder() {
@@ -130,7 +154,7 @@ export default class Thumbor extends Component {
     if (this.props.backgroundColor) style.backgroundColor = this.props.backgroundColor;
     if (this.props.contentStyles)
     return (<div key="placeholder" style={style}>
-      <div style={this.getContentStyle()}>{this.props.children}</div>
+      <div id={this.previewContentId} style={this.getContentStyle()}>{this.props.children}</div>
     </div>);
   }
 
