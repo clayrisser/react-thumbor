@@ -37833,6 +37833,7 @@ var Thumbor = (function (_Component) {
     value: function componentDidMount() {
       this.loadedImageId = this.getRandomId();
       this.id = this.getRandomId();
+      this.imageId = this.getRandomId();
       this.loadedImage = _react2['default'].createElement('img', { id: this.loadedImageId, key: 'loadedImage', src: this.image, onLoad: this.imageLoaded.bind(this), onError: this.imageError.bind(this), hidden: true });
       this.setState({ mounted: true });
     }
@@ -37840,9 +37841,14 @@ var Thumbor = (function (_Component) {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
       if (this.state.imageLoaded && this.imageRendered) {
-        document.getElementById(this.id).style.opacity = '1';
+        var image = document.getElementById(this.imageId);
+        setTimeout(function () {
+          image.style.opacity = 1;
+        }, 100);
         if (this.props.onRender) {
-          this.props.onRender();
+          this.props.onRender({
+            id: this.id
+          });
         }
       }
     }
@@ -37864,10 +37870,7 @@ var Thumbor = (function (_Component) {
       }
       return _react2['default'].createElement(
         'div',
-        { id: this.id, style: {
-            transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
-            opacity: 0
-          } },
+        { id: this.id },
         rendered
       );
     }
@@ -37876,11 +37879,15 @@ var Thumbor = (function (_Component) {
     value: function renderImage() {
       var attrs = {};
       var preset = this.getPreset();
-      attrs.style = _lodash2['default'].extend(attrs.style, {});
+      attrs.style = _lodash2['default'].extend(attrs.style, {
+        transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+        opacity: 0
+      });
       if (this.type === 'background') {
         attrs.style = _lodash2['default'].extend(attrs.style, {
-          backgroundImage: 'url("' + this.image + '")',
+          backgroundColor: 'rgba(255, 255, 255, 0)',
           backgroundPosition: 'center',
+          backgroundImage: 'url("' + this.image + '")',
           width: '100%'
         });
         if (this.width.value) attrs.style = _lodash2['default'].extend(attrs.style, { width: this.width.value + this.width.type });
@@ -37908,17 +37915,24 @@ var Thumbor = (function (_Component) {
       if (this.type === 'background') {
         return _react2['default'].createElement(
           'div',
-          _extends({ key: 'div' }, attrs),
-          this.props.children
+          { key: 'div' },
+          _react2['default'].createElement(
+            'div',
+            { style: this.getContentStyle() },
+            this.props.children
+          ),
+          _react2['default'].createElement('div', _extends({ id: this.imageId }, attrs))
         );
       } else {
-        return _react2['default'].createElement('img', _extends({ key: 'img', src: this.image }, attrs));
+        return _react2['default'].createElement('img', _extends({ key: 'img', id: this.imageId, src: this.image }, attrs));
       }
     }
   }, {
     key: 'getPlaceholder',
     value: function getPlaceholder() {
-      var style = {};
+      var style = {
+        backgroundColor: 'rgba(255, 255, 255, 0)'
+      };
       var preset = this.getPreset();
       if (this.height.value) style.height = this.height.value + this.height.type;
       if (this.width.value) style.width = this.width.value + this.width.type;
@@ -37930,7 +37944,28 @@ var Thumbor = (function (_Component) {
       if (this.props.maxHeight) style.maxHeight = this.props.maxHeight;
       if (this.props.width) style.width = this.props.width;
       if (this.props.maxWidth) style.maxWidth = this.props.maxWidth;
-      return _react2['default'].createElement('div', { key: 'placeholder', style: style });
+      if (this.props.backgroundColor) style.backgroundColor = this.props.backgroundColor;
+      if (this.props.contentStyles) return _react2['default'].createElement(
+        'div',
+        { key: 'placeholder', style: style },
+        _react2['default'].createElement(
+          'div',
+          { style: this.getContentStyle() },
+          this.props.children
+        )
+      );
+    }
+  }, {
+    key: 'getContentStyle',
+    value: function getContentStyle() {
+      var style = {
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        zIndex: 1,
+        position: 'absolute',
+        padding: '10px 20px'
+      };
+      if (this.props.contentStyle) style = _lodash2['default'].extend(style, this.props.contentStyle);
+      return style;
     }
   }, {
     key: 'getPreset',
