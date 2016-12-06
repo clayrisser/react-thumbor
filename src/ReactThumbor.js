@@ -74,7 +74,7 @@ export default class Thumbor extends Component {
       attrs.style = _.extend(attrs.style, {
         backgroundImage: 'url("' + this.image + '")'
       });
-      return (<div key="div" {...attrs}></div>);
+      return (<div key="div" {...attrs}>{this.props.children}</div>);
     } else {
       if (this.height.value) attrs.height = this.height.value + this.height.type;
       if (this.width.value) attrs.width = this.width.value + this.width.type;
