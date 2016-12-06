@@ -1,44 +1,38 @@
 import React, {Component} from 'react';
 import _ from 'lodash';
-import randomSeed from 'random-seed';
-var rand = randomSeed.create();
+import Chance from 'chance';
 
 export default class Thumbor extends Component {
 	constructor(props) {
 		super(props);
     this.state = {
-      imageLoaded: false
+      imageLoaded: false,
+      imageRendered: false
     };
 	}
 
   componentWillMount() {
-    if (global && global.reactThumbor && global.reactThumbor.server) {
-      this.server = global.reactThumbor.server;
-    }
+    this.chance = new Chance();
     if (this.props.server) {
       this.server = this.props.server;
+    } else {
+      this.server = '';
     }
-    this.height = this.newDimension(this.props.height, this.props.realHeight, 768);
-    this.width = this.newDimension(this.props.width, this.props.realWidth, 1024);
-    if (this.width.value && this.height.value) {
-      if (this.width.type === '%' && this.height.type === 'px') {
-        this.width.real = 0;
-      } else if (this.height.type === '%' && this.width.type === 'px') {
-        this.height.real = 0;
-      }
-    }
+    var dimensions = this.smartlyGuessDimensions();
+    this.height = this.newDimension(dimensions.height, dimensions.realHeight);
+    this.width = this.newDimension(dimensions.width, dimensions.realWidth);
     this.image = this.server + '/unsafe/' + this.width.real + 'x' + this.height.real + '/' + this.props.src;
-    this.loadedImageId = this.getRandomId();
+    this.loadedImageId = this.chance.string();
     this.loadedImage = (<img id={this.loadedImageId} key="loadedImage" src={this.image} onLoad={this.imageLoaded.bind(this)} onError={this.imageError.bind(this)} hidden={true} />);
   }
 
 	render() {
     var rendered = [this.loadedImage];
-    if (this.state.imageLoaded) {
+    if (this.state.imageLoaded && !this.state.imageRendered) {
       this.updateDimensions();
-      console.log(this.height);
-      console.log(this.width);
       rendered.push(this.renderImage());
+      console.log(this.width);
+      console.log(this.height);
     }
 		return (<div>
       {rendered}
@@ -47,38 +41,56 @@ export default class Thumbor extends Component {
 
   renderImage() {
     var attrs = {};
-    var preset = false;
-    var type = 'image';
-    switch (this.props.preset) {
-      case 'responsive':
-        preset = {
-          width: '100%',
-          backgroundPosition: 'top center',
-          backgroundSize: 'cover',
-          maxHeight: '360px'
-        };
-        type = 'background';
-        break;
-    }
-    if (this.props.type) type = this.props.type;
+    var preset = this.getPreset();
+    var type = this.getType();
+    attrs.style = _.extend(attrs.style, {
+      backgroundImage: 'url("' + this.image + '")',
+      maxWidth: '100%'
+    });
     if (type === 'background') {
+      attrs.style = _.extend(attrs.style, {
+        backgroundPosition: 'center'
+      });
       if (preset) attrs.style = _.extend(attrs.style, preset);
       if (this.height.value) attrs.style = _.extend(attrs.style, {height: this.height.value + this.height.type});
       if (this.width.value) attrs.style = _.extend(attrs.style, {width: this.width.value + this.width.type});
       if (this.props.backgroundPosition) attrs.style = _.extend(attrs.style, {backgroundPosition: this.props.backgroundPosition});
       if (this.props.backgroundRepeat) attrs.style = _.extend(attrs.style, {backgroundRepeat: this.props.backgroundRepeat});
       if (this.props.backgroundColor) attrs.style = _.extend(attrs.style, {backgroundColor: this.props.backgroundColor});
-      if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
-      if (this.props.maxWidth) attrs.style = _.extend(attrs.style, {maxWidth: this.props.maxWidth});
       if (this.props.backgroundSize) attrs.style = _.extend(attrs.style, {backgroundSize: this.props.backgroundSize});
-      attrs.style = _.extend(attrs.style, {
-        backgroundImage: 'url("' + this.image + '")'
-      });
+
       return (<div key="div" {...attrs}>{this.props.children}</div>);
     } else {
       if (this.height.value) attrs.height = this.height.value + this.height.type;
       if (this.width.value) attrs.width = this.width.value + this.width.type;
       return (<img key="img" src={this.image} {...attrs} />);
+    }
+    if (this.props.maxWidth) attrs.style = _.extend(attrs.style, {maxWidth: this.props.maxWidth});
+    if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
+    this.setState({imageRendered: true});
+  }
+
+  getPreset() {
+    switch (this.props.preset) {
+      case 'responsive':
+        return {
+          maxWidth: '100%',
+          backgroundPosition: 'top center',
+          backgroundSize: 'cover',
+          maxHeight: '360px'
+        };
+      default:
+        return false;
+    }
+  }
+
+  getType() {
+    if (this.props.type) return this.props.type;
+    switch (this.props.preset) {
+      case 'responsive':
+        return 'background';
+      default:
+        return 'image';
     }
   }
 
@@ -91,42 +103,82 @@ export default class Thumbor extends Component {
   }
 
   updateDimensions() {
-    if (document) {
-      var loadedImage = document.getElementById(this.loadedImageId);
+    var loadedImage = document.getElementById(this.loadedImageId);
+    if (this.props.type === 'background') {
       if (!this.props.height && !this.props.width) {
         this.width.value = loadedImage.naturalWidth;
         this.height.value = loadedImage.naturalHeight;
+      } else {
+        if (!this.props.height) {
+          this.height.value = loadedImage.naturalHeight;
+        } else if (!this.props.width && this.height.type === '%') {
+          this.width.value = loadedImage.naturalWidth;
+        }
       }
     }
   }
 
-  newDimension(dimension, realOverride, realFallback) {
+  smartlyGuessDimensions() {
+    var width = this.props.width;
+    var height = this.props.height;
+    var realHeight = this.props.realHeight;
+    var realWidth = this.props.realWidth;
+    var maxHeight = this.props.maxHeight;
+    var maxWidth = this.props.maxWidth;
+    if ((!width || width.substring(width.length - 1) === '%') &&    // if i have to be smart
+        (!height || height.substring(height.length - 1) === '%')) { // about guessing dimensions
+      var guessed = false;
+      if (maxWidth) {
+        if (maxWidth.substring(maxWidth.length - 2) === 'px') {
+          maxWidth = maxWidth.substring(0, maxWidth.length - 2);
+        }
+        if (Number(maxWidth) <= 1024) {
+          realWidth = maxWidth;
+          guessed = true;
+        }
+      } else if (maxHeight) {
+        if (maxHeight.substring(maxHeight.length - 2) === 'px') {
+          maxHeight = maxHeight.substring(0, maxHeight.length - 2);
+        }
+        if (Number(maxHeight) <= 768) {
+          realHeight = maxHeight;
+          guessed = true;
+        }
+      }
+      if (!guessed) {
+        realWidth = '1024';
+      }
+    }
+    return {
+      width,
+      height,
+      realHeight,
+      realWidth,
+    };
+  }
+
+  newDimension(dimension, real) {
+    if (real && real.substring(real.length - 2) === 'px') {
+      real = real.substring(0, real.length - 2);
+    }
     if (dimension && dimension.substring(dimension.length - 1) === '%') { // percent
       return {
         value: Number(dimension.substring(0, dimension.length - 1)),
         type: '%',
-        real: Number(realOverride ? realOverride : (realFallback ? realFallback : 1024))
+        real: Number(real ? real : 0)
       };
     } else if (dimension && dimension.substring(dimension.length - 2) === 'px') { // px
       return {
         value: Number(dimension.substring(0, dimension.length - 2)),
         type: 'px',
-        real: Number(realOverride ? realOverride : dimension.substring(0, dimension.length - 2))
+        real: Number(real ? real : dimension.substring(0, dimension.length - 2))
       };
     } else { // assumed px
       return {
         value: dimension ? Number(dimension) : undefined,
         type: 'px',
-        real: Number(realOverride ? realOverride : (dimension ? dimension : 0))
+        real: Number(real ? real : (dimension ? dimension : 0))
       };
     }
-  }
-
-  getRandomId() {
-    var random = rand(32);
-    if (document && document.getElementById(random)) {
-      random = getRandomId();
-    }
-    return random;
   }
 }
