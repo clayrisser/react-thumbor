@@ -91,10 +91,12 @@ export default class Thumbor extends Component {
   }
 
   updateDimensions() {
-    var loadedImage = document.getElementById(this.loadedImageId);
-    if (!this.props.height && !this.props.width) {
-      this.width.value = loadedImage.naturalWidth;
-      this.height.value = loadedImage.naturalHeight;
+    if (document) {
+      var loadedImage = document.getElementById(this.loadedImageId);
+      if (!this.props.height && !this.props.width) {
+        this.width.value = loadedImage.naturalWidth;
+        this.height.value = loadedImage.naturalHeight;
+      }
     }
   }
 
@@ -122,7 +124,7 @@ export default class Thumbor extends Component {
 
   getRandomId() {
     var random = rand(32);
-    if (document.getElementById(random)) {
+    if (document && document.getElementById(random)) {
       random = getRandomId();
     }
     return random;
