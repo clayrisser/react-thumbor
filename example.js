@@ -52,7 +52,7 @@ var App = (function (_Component) {
 					_react2['default'].createElement(
 						'h1',
 						null,
-						'This is Hard'
+						'This aklsjd lksdjf askldjf sdaklfjksdf lslkdf slkdjf slk djflk sdjflk sadflksjdflksd is Hard alksdjf as'
 					)
 				)
 			);

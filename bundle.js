@@ -37844,8 +37844,10 @@ var Thumbor = (function (_Component) {
     value: function componentDidUpdate() {
       var _this = this;
 
-      if (this.state.mounted && !this.state.imageLoaded) {
-        this.resized();
+      this.resized();
+      if (this.type === 'background' && !this.imageRendered) {
+        var content = document.getElementById(this.previewContentId);
+        content.style.display = 'inherit';
       }
       if (this.state.imageLoaded && this.imageRendered) {
         var image = document.getElementById(this.imageId);
@@ -37897,8 +37899,8 @@ var Thumbor = (function (_Component) {
           content = document.getElementById(this.previewContentId);
           parent = document.getElementById(this.id);
         }
-        content.style.width = parent.offsetWidth - this.pixelToNumber(content.style.paddingLeft) - this.pixelToNumber(content.style.paddingRight) + 'px';
-        content.style.height = parent.offsetHeight - this.pixelToNumber(content.style.paddingTop) - this.pixelToNumber(content.style.paddingBottom) + 'px';
+        content.style.width = parent.offsetWidth + 'px';
+        content.style.height = parent.offsetHeight + 'px';
       }
     }
   }, {
@@ -37945,19 +37947,24 @@ var Thumbor = (function (_Component) {
           { key: 'div' },
           _react2['default'].createElement(
             'div',
-            { id: this.finalContentId, style: this.getContentStyle() },
-            this.props.children
+            { style: {
+                margin: '0px',
+                padding: '0px',
+                backgroundColor: 'rgba(255, 255, 255, 0)',
+                zIndex: 1,
+                position: 'absolute'
+              }, id: this.finalContentId },
+            _react2['default'].createElement(
+              'div',
+              { style: this.getContentStyle() },
+              this.props.children
+            )
           ),
           _react2['default'].createElement('div', _extends({ id: this.imageId }, attrs))
         );
       } else {
         return _react2['default'].createElement('img', _extends({ key: 'img', id: this.imageId, src: this.image }, attrs));
       }
-    }
-  }, {
-    key: 'pixelToNumber',
-    value: function pixelToNumber(pixel) {
-      return Number(pixel.substring(0, pixel.length - 2));
     }
   }, {
     key: 'getPlaceholder',
@@ -37982,8 +37989,19 @@ var Thumbor = (function (_Component) {
         { key: 'placeholder', style: style },
         _react2['default'].createElement(
           'div',
-          { id: this.previewContentId, style: this.getContentStyle() },
-          this.props.children
+          { style: {
+              margin: '0px',
+              padding: '0px',
+              backgroundColor: 'rgba(255, 255, 255, 0)',
+              zIndex: 1,
+              display: 'none',
+              position: 'absolute'
+            }, id: this.previewContentId },
+          _react2['default'].createElement(
+            'div',
+            { style: this.getContentStyle() },
+            this.props.children
+          )
         )
       );
     }
@@ -37991,9 +38009,6 @@ var Thumbor = (function (_Component) {
     key: 'getContentStyle',
     value: function getContentStyle() {
       var style = {
-        backgroundColor: 'rgba(255, 255, 255, 0)',
-        zIndex: 1,
-        position: 'absolute',
         padding: '10px 20px'
       };
       if (this.props.contentStyle) style = _lodash2['default'].extend(style, this.props.contentStyle);
