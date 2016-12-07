@@ -37,7 +37,7 @@ export default class Thumbor extends Component {
 
   componentDidUpdate() {
     this.resized();
-    if (this.type === 'background' && !this.imageRendered) {
+    if (this.props.waitTillReady && this.type === 'background' && !this.imageRendered) {
       var content = document.getElementById(this.previewContentId);
       content.style.display = 'inherit';
     }
@@ -98,7 +98,7 @@ export default class Thumbor extends Component {
     var attrs = {};
     var preset = this.getPreset();
     attrs.style = _.extend(attrs.style, {
-      transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+      transition: 'opacity 2s cubic-bezier(.5, 0, 0, 1)',
       opacity: 0
     });
     if (this.type === 'background') {
@@ -172,7 +172,7 @@ export default class Thumbor extends Component {
         padding: '0px',
         backgroundColor: 'rgba(255, 255, 255, 0)',
         zIndex: 1,
-        display: 'none',
+        display: this.props.waitTillReady ? 'none' : undefined,
         position: 'absolute'
       }} id={this.previewContentId}>
         <div style={this.getContentStyle()}>{this.props.children}</div>
@@ -181,9 +181,7 @@ export default class Thumbor extends Component {
   }
 
   getContentStyle() {
-    var style = {
-      padding: '10px 20px'
-    };
+    var style = {};
     if (this.props.contentStyle) style = _.extend(style, this.props.contentStyle);
     return style;
   }
