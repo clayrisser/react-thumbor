@@ -43,17 +43,19 @@ export default class Thumbor extends Component {
     }
     if (this.state.imageLoaded && this.imageRendered) {
       var image = document.getElementById(this.imageId);
-      setTimeout(() => {
-        image.style.opacity = 1;
-      }, 100);
-      if (this.props.onRender) {
-        this.props.onRender({
-          id: this.id
+      if (image) {
+        setTimeout(() => {
+          image.style.opacity = 1;
+        }, 100);
+        if (this.props.onRender) {
+          this.props.onRender({
+            id: this.id
+          });
+        }
+        window.addEventListener('resize', () => {
+          this.resized();
         });
       }
-      window.addEventListener('resize', () => {
-        this.resized();
-      });
     }
   }
 
