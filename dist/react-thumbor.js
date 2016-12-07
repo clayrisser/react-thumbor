@@ -37900,8 +37900,8 @@ var Thumbor = (function (_Component) {
           content = document.getElementById(this.previewContentId);
           parent = document.getElementById(this.id);
         }
-        content.style.width = parent.offsetWidth + 'px';
-        content.style.height = parent.offsetHeight + 'px';
+        if (content) content.style.width = parent.offsetWidth + 'px';
+        if (content) content.style.height = parent.offsetHeight + 'px';
       }
     }
   }, {
