@@ -37941,7 +37941,7 @@ var Thumbor = (function (_Component) {
       if (this.props.maxWidth) attrs.style = _lodash2['default'].extend(attrs.style, { maxWidth: this.props.maxWidth });
       if (this.props.maxHeight) attrs.style = _lodash2['default'].extend(attrs.style, { maxHeight: this.props.maxHeight });
       if (this.props.minWidth) attrs.style = _lodash2['default'].extend(attrs.style, { minWidth: this.props.minWidth });
-      if (this.props.minWidth) attrs.style = _lodash2['default'].extend(attrs.style, { minWidth: this.props.minWidth });
+      if (this.props.minHeight) attrs.style = _lodash2['default'].extend(attrs.style, { minHeight: this.props.minHeight });
       this.imageRendered = true;
       if (this.type === 'background') {
         return _react2['default'].createElement(
