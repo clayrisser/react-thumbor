@@ -37845,7 +37845,7 @@ var Thumbor = (function (_Component) {
       var _this = this;
 
       this.resized();
-      if (this.type === 'background' && !this.imageRendered) {
+      if (this.props.waitTillReady && this.type === 'background' && !this.imageRendered) {
         var content = document.getElementById(this.previewContentId);
         content.style.display = 'inherit';
       }
@@ -37911,7 +37911,7 @@ var Thumbor = (function (_Component) {
       var attrs = {};
       var preset = this.getPreset();
       attrs.style = _lodash2['default'].extend(attrs.style, {
-        transition: 'opacity 4s cubic-bezier(.5, 0, 0, 1)',
+        transition: 'opacity 2s cubic-bezier(.5, 0, 0, 1)',
         opacity: 0
       });
       if (this.type === 'background') {
@@ -37998,7 +37998,7 @@ var Thumbor = (function (_Component) {
               padding: '0px',
               backgroundColor: 'rgba(255, 255, 255, 0)',
               zIndex: 1,
-              display: 'none',
+              display: this.props.waitTillReady ? 'none' : undefined,
               position: 'absolute'
             }, id: this.previewContentId },
           _react2['default'].createElement(
@@ -38012,9 +38012,7 @@ var Thumbor = (function (_Component) {
   }, {
     key: 'getContentStyle',
     value: function getContentStyle() {
-      var style = {
-        padding: '10px 20px'
-      };
+      var style = {};
       if (this.props.contentStyle) style = _lodash2['default'].extend(style, this.props.contentStyle);
       return style;
     }
