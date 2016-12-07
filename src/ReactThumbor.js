@@ -128,7 +128,7 @@ export default class Thumbor extends Component {
     if (this.props.maxWidth) attrs.style = _.extend(attrs.style, {maxWidth: this.props.maxWidth});
     if (this.props.maxHeight) attrs.style = _.extend(attrs.style, {maxHeight: this.props.maxHeight});
     if (this.props.minWidth) attrs.style = _.extend(attrs.style, {minWidth: this.props.minWidth});
-    if (this.props.minWidth) attrs.style = _.extend(attrs.style, {minWidth: this.props.minWidth});
+    if (this.props.minHeight) attrs.style = _.extend(attrs.style, {minHeight: this.props.minHeight});
     this.imageRendered = true;
     if (this.type === 'background') {
       return (<div key="div">
