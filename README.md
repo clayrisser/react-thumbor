@@ -2,6 +2,8 @@
 
 __COMPONENT DESCRIPTION GOES HERE__
 
+![](assets/react-thumbor.png)
+
 
 ## Demo & Examples
 
